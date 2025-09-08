@@ -71,3 +71,57 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## CMS (Decap) for managing content
+
+We added a lightweight CMS so you can edit homepage content without changing code.
+
+- Admin URL (local): `/admin/`
+- Content file: `public/content/home.json`
+- You can edit hero text, CTAs, and services. Icons available: Code, Smartphone, Palette, Settings.
+
+How to run locally:
+
+```sh
+npm i
+npm run dev
+# open http://localhost:8080/admin/
+```
+
+Deploy notes:
+- The CMS UI is static and works on any static host. For Git-based editing (git-gateway), ensure your host integrates with your repo provider or use a Netlify-compatible setup. Alternatively, you can edit JSON directly.
+- If using a different default branch than `main`, update `public/admin/config.yml`.
+
+### Manage content with CMS
+
+- Open `/admin` while dev server is running to access the CMS.
+- Pages live under `Pages` in the sidebar (About, Services, Projects page intro, FAQs, Contact).
+- Projects live under `Projects` where you can add/edit items (title, summary, images, body).
+- Homepage content is under `Homepage`.
+
+If you don’t see changes, refresh the site and clear cache. For production, ensure your hosting allows Git-based writes (git-gateway) or edit JSON files directly in the repo.
+
+### Run the CMS GUI locally
+
+In one terminal:
+```sh
+npm run dev
+```
+In another terminal:
+```sh
+npm run cms
+```
+Then open `http://localhost:8080/cms-admin/index.html`.
+
+### Authentication (demo)
+
+This project includes a simple local demo auth (not for production):
+- Default admin: username `admin`, password `Atech@12345`
+- Users you create via Sign Up are regular users.
+
+How to use:
+- Use the header links to Login or Sign Up
+- Once logged in as admin, use the Admin button (or visit `/cms`) to access the CMS GUI at `/cms-admin/`
+- Logout from the header
+
+Notes: Credentials are stored in browser localStorage for demo purposes only.

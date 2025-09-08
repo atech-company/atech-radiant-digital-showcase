@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +29,11 @@ const Navigation = () => {
     { name: 'FAQs', href: '/faqs' },
     { name: 'Contact', href: '/contact' },
   ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav
@@ -62,8 +70,23 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Get Quote Button */}
-          <div className="hidden md:block">
+          {/* Right controls */}
+          <div className="hidden md:flex items-center space-x-3">
+            {!user ? (
+              <>
+                <Link to="/login" className="text-sm text-foreground hover:text-primary">Login</Link>
+                <Button asChild variant="outline">
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild variant="secondary">
+                  <a href="/cms-admin/index.html">Admin</a>
+                </Button>
+                <Button onClick={handleLogout} variant="outline">Logout</Button>
+              </>
+            )}
             <Button
               className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 glow-effect"
               asChild
@@ -98,6 +121,23 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              {!user ? (
+                <div className="flex gap-3">
+                  <Button asChild variant="outline" className="flex-1">
+                    <Link to="/login" onClick={() => setIsOpen(false)}>Login</Link>
+                  </Button>
+                  <Button asChild className="flex-1">
+                    <Link to="/signup" onClick={() => setIsOpen(false)}>Sign Up</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <Button asChild variant="secondary" className="flex-1">
+                    <a href="/cms-admin/index.html" onClick={() => setIsOpen(false)}>Admin</a>
+                  </Button>
+                  <Button onClick={() => { handleLogout(); setIsOpen(false); }} variant="outline" className="flex-1">Logout</Button>
+                </div>
+              )}
               <Button
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 glow-effect"
                 asChild
