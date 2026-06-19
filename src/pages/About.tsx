@@ -1,6 +1,10 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SeoHead from '@/components/SeoHead';
+import { PAGE_SEO } from '@/lib/seo';
+import { breadcrumbSchema, organizationSchema } from '@/lib/schema';
 import { Badge } from '@/components/ui/badge';
+import { usePageContent } from '@/hooks/use-content';
 import { 
   Target, 
   Eye, 
@@ -17,97 +21,65 @@ import {
 } from 'lucide-react';
 
 const About = () => {
-  const stats = [
-    { number: "100+", label: "Projects Completed", icon: Award },
-    { number: "50+", label: "Happy Clients", icon: Users },
-    { number: "8+", label: "Years Experience", icon: TrendingUp },
-    { number: "24/7", label: "Support Available", icon: Shield }
-  ];
-
-  const timeline = [
-    {
-      year: "2016",
-      title: "A TECH Founded",
-      description: "Started as a small team of passionate developers with a vision to create exceptional digital experiences."
-    },
-    {
-      year: "2018",
-      title: "First Major Success",
-      description: "Delivered our first enterprise-level project, establishing our reputation for quality and innovation."
-    },
-    {
-      year: "2020",
-      title: "Team Expansion",
-      description: "Grew our team to include specialized UI/UX designers and mobile app developers."
-    },
-    {
-      year: "2022",
-      title: "100 Projects Milestone",
-      description: "Celebrated completing over 100 successful projects across various industries."
-    },
-    {
-      year: "2024",
-      title: "Innovation Leader",
-      description: "Recognized as a leading digital agency, specializing in cutting-edge technologies and modern design."
+  const { data: cmsPage } = usePageContent('about');
+  const merged = (cmsPage?.sections ?? []).reduce<Record<string, unknown>>((acc, section) => {
+    Object.assign(acc, section.payload ?? {});
+    return acc;
+  }, {});
+  const parseArray = <T,>(value: unknown): T[] => {
+    if (Array.isArray(value)) return value as T[];
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? (parsed as T[]) : [];
+      } catch {
+        return [];
+      }
     }
-  ];
+    return [];
+  };
 
-  const team = [
-    {
-      name: "Alex Chen",
-      role: "CEO & Founder",
-      speciality: "Full-Stack Development",
-      icon: Code,
-      description: "8+ years building scalable web applications and leading development teams."
-    },
-    {
-      name: "Sarah Johnson",
-      role: "Creative Director",
-      speciality: "UI/UX Design",
-      icon: Palette,
-      description: "Expert in user-centered design with a passion for creating beautiful, functional interfaces."
-    },
-    {
-      name: "Michael Rodriguez",
-      role: "Tech Lead",
-      speciality: "Mobile Development",
-      icon: Smartphone,
-      description: "Specialized in cross-platform mobile apps with focus on performance and user experience."
-    },
-    {
-      name: "Emily Davis",
-      role: "Project Manager",
-      speciality: "Strategy & Operations",
-      icon: Target,
-      description: "Ensures projects are delivered on time and exceed client expectations."
-    }
-  ];
+  const stats = parseArray<{ number: string; label: string; icon?: string }>(merged.stats).map((s) => ({
+    ...s,
+    icon:
+      s.icon === 'Users' ? Users :
+      s.icon === 'TrendingUp' ? TrendingUp :
+      s.icon === 'Shield' ? Shield :
+      Award,
+  }));
 
-  const values = [
-    {
-      icon: Lightbulb,
-      title: "Innovation",
-      description: "We embrace cutting-edge technologies and creative solutions to solve complex challenges."
-    },
-    {
-      icon: Heart,
-      title: "Passion",
-      description: "Every project is approached with enthusiasm and dedication to excellence."
-    },
-    {
-      icon: Users,
-      title: "Collaboration",
-      description: "We work closely with our clients as partners to achieve shared success."
-    },
-    {
-      icon: Globe,
-      title: "Impact",
-      description: "Creating digital solutions that make a meaningful difference in businesses and lives."
-    }
-  ];
+  const timeline = parseArray<{ year: string; title: string; description: string }>(merged.timeline);
+
+  const team = parseArray<{ name: string; role: string; speciality: string; icon?: string; description: string }>(merged.team).map((m) => ({
+    ...m,
+    icon:
+      m.icon === 'Palette' ? Palette :
+      m.icon === 'Smartphone' ? Smartphone :
+      m.icon === 'Target' ? Target :
+      Code,
+  }));
+
+  const values = parseArray<{ icon?: string; title: string; description: string }>(merged.values).map((v) => ({
+    ...v,
+    icon:
+      v.icon === 'Heart' ? Heart :
+      v.icon === 'Users' ? Users :
+      v.icon === 'Globe' ? Globe :
+      Lightbulb,
+  }));
 
   return (
     <div className="min-h-screen">
+      <SeoHead
+        {...PAGE_SEO.about}
+        jsonLd={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'About', path: '/about' },
+          ]),
+        ]}
+      />
       <Navigation />
       <main className="pt-16">
         {/* Hero Section */}
@@ -116,10 +88,10 @@ const About = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                About <span className="gradient-text">A TECH</span>
+                {String(merged.heroTitle ?? '')} <span className="gradient-text">{String(merged.heroAccent ?? '')}</span>
               </h1>
               <p className="text-xl text-muted-foreground animate-fade-in-up max-w-3xl mx-auto">
-                We are a passionate team of developers, designers, and digital strategists dedicated to creating exceptional digital experiences that drive business growth.
+                {String(merged.heroDescription ?? '')}
               </p>
             </div>
           </div>
@@ -151,25 +123,11 @@ const About = () => {
                   <div className="p-3 rounded-xl bg-gradient-to-r from-primary to-secondary glow-effect">
                     <Target className="h-6 w-6 text-background" />
                   </div>
-                  <h2 className="text-3xl font-bold gradient-text">Our Mission</h2>
+                  <h2 className="text-3xl font-bold gradient-text">{String(merged.missionTitle ?? '')}</h2>
                 </div>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  To empower businesses with innovative digital solutions that drive growth, enhance user experiences, and create lasting value. We believe in the transformative power of technology and design to solve real-world problems.
+                  {String(merged.missionText ?? '')}
                 </p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-muted-foreground">Deliver exceptional digital experiences</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-muted-foreground">Build long-term partnerships with clients</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-muted-foreground">Stay at the forefront of technology</span>
-                  </div>
-                </div>
               </div>
 
               <div className="space-y-8">
@@ -177,25 +135,11 @@ const About = () => {
                   <div className="p-3 rounded-xl bg-gradient-to-r from-primary to-secondary glow-effect">
                     <Eye className="h-6 w-6 text-background" />
                   </div>
-                  <h2 className="text-3xl font-bold gradient-text">Our Vision</h2>
+                  <h2 className="text-3xl font-bold gradient-text">{String(merged.visionTitle ?? '')}</h2>
                 </div>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  To be the leading digital agency recognized for innovation, quality, and exceptional client service. We envision a future where every business has access to world-class digital solutions that help them thrive in the digital age.
+                  {String(merged.visionText ?? '')}
                 </p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    <span className="text-muted-foreground">Pioneer innovative digital solutions</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    <span className="text-muted-foreground">Set industry standards for quality</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                    <span className="text-muted-foreground">Expand our global impact</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -206,10 +150,10 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Our <span className="gradient-text">Journey</span>
+                {String(merged.timelineTitle ?? '')}
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                From humble beginnings to industry recognition, here's how A TECH has evolved over the years.
+                {String(merged.timelineDescription ?? '')}
               </p>
             </div>
 
@@ -242,10 +186,10 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Meet Our <span className="gradient-text">Team</span>
+                {String(merged.teamTitle ?? '')}
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Our diverse team of experts brings together years of experience in development, design, and project management.
+                {String(merged.teamDescription ?? '')}
               </p>
             </div>
 
@@ -272,10 +216,10 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Our <span className="gradient-text">Values</span>
+                {String(merged.valuesTitle ?? '')}
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                These core values guide everything we do and shape how we work with our clients and each other.
+                {String(merged.valuesDescription ?? '')}
               </p>
             </div>
 
@@ -298,23 +242,23 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="text-center max-w-4xl mx-auto p-12 bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-2xl border border-border card-shadow">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Ready to Work <span className="gradient-text">Together?</span>
+                {String(merged.ctaTitle ?? '')}
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Let's discuss your project and see how A TECH can help bring your digital vision to life.
+                {String(merged.ctaDescription ?? '')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="/contact"
                   className="inline-flex items-center justify-center px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-background font-semibold glow-effect hover:opacity-90 smooth-transition"
                 >
-                  Start Your Project
+                  {String(merged.ctaPrimaryLabel ?? '')}
                 </a>
                 <a
                   href="/projects"
                   className="inline-flex items-center justify-center px-8 py-3 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card smooth-transition"
                 >
-                  View Our Work
+                  {String(merged.ctaSecondaryLabel ?? '')}
                 </a>
               </div>
             </div>

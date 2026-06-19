@@ -1,8 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, MessageCircle, Phone, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useHomeContent } from '@/hooks/use-content';
 
 const ContactCTA = () => {
+  const { data: home } = useHomeContent();
+  const phone = String((home as any)?.contactPhone ?? '76349746');
+  const email = String((home as any)?.contactEmail ?? 'hello@example.com');
+  const whatsapp = String((home as any)?.contactWhatsapp ?? '76349746');
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background Effects */}
@@ -13,13 +19,12 @@ const ContactCTA = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Start Your 
+            {String((home as any)?.contactCtaTitleLine1 ?? 'Ready to Start Your')}
             <br />
-            <span className="gradient-text">Digital Journey?</span>
+            <span className="gradient-text">{String((home as any)?.contactCtaTitleLine2 ?? 'Digital Journey?')}</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Let's discuss your project and discover how A TECH can help transform 
-            your ideas into powerful digital solutions that drive real results.
+            {String((home as any)?.contactCtaDescription ?? '')}
           </p>
         </div>
 
@@ -32,7 +37,7 @@ const ContactCTA = () => {
           >
             <Link to="/contact">
               <MessageCircle className="mr-3 h-6 w-6" />
-              Get a Free Consultation
+              {String((home as any)?.contactCtaPrimaryLabel ?? 'Get a Free Consultation')}
               <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
@@ -42,7 +47,7 @@ const ContactCTA = () => {
             className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 text-lg"
             asChild
           >
-            <Link to="/projects">View Our Portfolio</Link>
+            <Link to="/projects">{String((home as any)?.contactCtaSecondaryLabel ?? 'View Our Portfolio')}</Link>
           </Button>
         </div>
 
@@ -55,10 +60,10 @@ const ContactCTA = () => {
             <h3 className="text-lg font-semibold mb-2">Call Us</h3>
             <p className="text-muted-foreground mb-3">Let's talk about your project</p>
             <a 
-              href="tel:+15551234567" 
+              href={`tel:${phone}`} 
               className="text-primary hover:underline font-medium"
             >
-              +1 (555) 123-4567
+              {phone}
             </a>
           </div>
 
@@ -69,10 +74,10 @@ const ContactCTA = () => {
             <h3 className="text-lg font-semibold mb-2">Email Us</h3>
             <p className="text-muted-foreground mb-3">Send us your requirements</p>
             <a 
-              href="mailto:hello@atech.com" 
+              href={`mailto:${email}`} 
               className="text-primary hover:underline font-medium"
             >
-              hello@atech.com
+              {email}
             </a>
           </div>
 
@@ -83,7 +88,7 @@ const ContactCTA = () => {
             <h3 className="text-lg font-semibold mb-2">WhatsApp</h3>
             <p className="text-muted-foreground mb-3">Quick chat and support</p>
             <a 
-              href="https://wa.me/15551234567" 
+              href={`https://wa.me/${whatsapp}`} 
               className="text-primary hover:underline font-medium"
               target="_blank"
               rel="noopener noreferrer"

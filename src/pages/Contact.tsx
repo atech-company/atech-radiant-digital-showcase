@@ -1,15 +1,26 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SeoHead from '@/components/SeoHead';
+import { PAGE_SEO } from '@/lib/seo';
+import { breadcrumbSchema, localBusinessSchema, organizationSchema } from '@/lib/schema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Mail, Phone, MapPin, MessageCircle, Clock, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePageContent } from '@/hooks/use-content';
 
 const Contact = () => {
   const { toast } = useToast();
+  const { data: cmsPage } = usePageContent('contact');
+  const merged = (cmsPage?.sections ?? []).reduce<Record<string, unknown>>((acc, section) => {
+    Object.assign(acc, section.payload ?? {});
+    return acc;
+  }, {});
+  const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://127.0.0.1:8000';
+  const WHATSAPP_NUMBER = '76349746';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -32,13 +43,23 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/contact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send contact request');
+      }
+
+      const data = (await response.json()) as { whatsapp_url?: string };
       toast({
         title: "Message sent successfully!",
-        description: "We'll get back to you within 24 hours.",
+        description: "Email sent. WhatsApp chat will open now.",
       });
-      setIsSubmitting(false);
+
       setFormData({
         name: '',
         email: '',
@@ -48,35 +69,46 @@ const Contact = () => {
         message: '',
         budget: ''
       });
-    }, 1000);
+
+      const waUrl = data.whatsapp_url ?? `https://wa.me/${WHATSAPP_NUMBER}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast({
+        title: 'Failed to send message',
+        description: 'Please try again in a moment.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactMethods = [
     {
       icon: Mail,
       title: "Email Us",
-      value: "hello@atech.com",
+      value: "atech@atechleb.com",
       description: "Send us an email anytime",
-      action: "mailto:hello@atech.com"
+      action: "mailto:atech@atechleb.com"
     },
     {
       icon: Phone,
       title: "Call Us",
-      value: "+1 (555) 123-4567",
-      description: "Mon-Fri 9AM-6PM PST",
-      action: "tel:+15551234567"
+      value: "+961 76 349 746",
+      description: "Mon-Fri 9AM-6PM LB",
+      action: "tel:+96176349746"
     },
     {
       icon: MessageCircle,
       title: "WhatsApp",
-      value: "+1 (555) 123-4567",
+      value: "76349746",
       description: "Quick chat on WhatsApp",
-      action: "https://wa.me/15551234567"
+      action: "https://wa.me/76349746"
     },
     {
       icon: MapPin,
       title: "Visit Us",
-      value: "Silicon Valley, CA",
+      value: "Beiruth, LB",
       description: "Schedule an appointment",
       action: "#"
     }
@@ -84,6 +116,17 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen">
+      <SeoHead
+        {...PAGE_SEO.contact}
+        jsonLd={[
+          organizationSchema(),
+          localBusinessSchema(),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Contact', path: '/contact' },
+          ]),
+        ]}
+      />
       <Navigation />
       <main className="pt-16">
         {/* Hero Section */}
@@ -92,10 +135,10 @@ const Contact = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Contact <span className="gradient-text">A TECH</span>
+                {String(merged.heroTitle ?? 'Contact')} <span className="gradient-text">{String(merged.heroAccent ?? 'A TECH')}</span>
               </h1>
               <p className="text-xl text-muted-foreground animate-fade-in-up">
-                Ready to start your project? Get in touch with our team and let's build something amazing together.
+                {String(merged.heroDescription ?? "Ready to start your project? Get in touch with our team and let's build something amazing together.")}
               </p>
             </div>
           </div>
@@ -273,7 +316,7 @@ const Contact = () => {
                   <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8 h-64 flex items-center justify-center">
                     <div className="text-center">
                       <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
-                      <h4 className="text-xl font-semibold mb-2">Silicon Valley, CA</h4>
+                      <h4 className="text-xl font-semibold mb-2">Beirut, LB</h4>
                       <p className="text-muted-foreground">Heart of Innovation</p>
                       <p className="text-muted-foreground">Virtual meetings available worldwide</p>
                     </div>

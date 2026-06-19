@@ -60,6 +60,36 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Laravel CMS backend (Filament + APIs)
+
+This project now includes a Laravel backend CMS in `backend/` with:
+- Filament admin panel at `http://127.0.0.1:8000/admin`
+- Public APIs:
+  - `GET /api/v1/pages/{slug}`
+  - `GET /api/v1/projects`
+  - `GET /api/v1/settings`
+
+Default admin user after seeding:
+- Email: `admin@atech.local`
+- Password: `Atech@12345`
+
+Run backend locally:
+
+```sh
+cd backend
+composer install
+php artisan migrate:fresh --seed
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Connect frontend to backend API:
+
+```sh
+cp .env.example .env.local
+# ensure VITE_API_BASE_URL=http://127.0.0.1:8000
+npm run dev
+```
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/4f4fe83a-fb09-4244-b842-aeca9cbf8317) and click on Share -> Publish.

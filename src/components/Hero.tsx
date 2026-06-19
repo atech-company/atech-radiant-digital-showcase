@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Code, Smartphone, Palette } from 'lucide-react';
+import { ArrowRight, Code, Smartphone, Palette, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroBackground from '@/assets/hero-background.jpg';
 import { useHomeContent } from '@/hooks/use-content';
@@ -7,20 +7,13 @@ import { useHomeContent } from '@/hooks/use-content';
 const Hero = () => {
 	const { data } = useHomeContent();
 
-	const heading1 = data?.heroHeading1 ?? 'Digital Solutions';
-	const heading2 = data?.heroHeading2 ?? 'That Transform';
-	const subtitle = data?.heroSubtitle ?? 'We craft cutting-edge software, stunning websites, and powerful mobile apps that drive your business forward in the digital age.';
-	const ctas = data?.heroCtas ?? [
-		{ label: 'Start Your Project', href: '/contact' },
-		{ label: 'View Our Work', href: '/projects', variant: 'outline' as const },
-	];
-	const serviceIcons = data?.serviceIcons ?? [
-		{ label: 'Web Development', icon: 'Code' as const },
-		{ label: 'Mobile Apps', icon: 'Smartphone' as const },
-		{ label: 'UI/UX Design', icon: 'Palette' as const },
-	];
+	const heading1 = data?.heroHeading1 ?? '';
+	const heading2 = data?.heroHeading2 ?? '';
+	const subtitle = data?.heroSubtitle ?? '';
+	const ctas = data?.heroCtas ?? [];
+	const serviceIcons = data?.serviceIcons ?? [];
 
-	const renderIcon = (name: 'Code' | 'Smartphone' | 'Palette') => {
+	const renderIcon = (name: 'Code' | 'Smartphone' | 'Palette' | 'Settings') => {
 		switch (name) {
 			case 'Code':
 				return <Code className="h-8 w-8 text-primary" />;
@@ -28,6 +21,8 @@ const Hero = () => {
 				return <Smartphone className="h-8 w-8 text-secondary" />;
 			case 'Palette':
 				return <Palette className="h-8 w-8 text-accent" />;
+			case 'Settings':
+				return <Settings className="h-8 w-8 text-primary" />;
 		}
 	};
 
@@ -48,16 +43,24 @@ const Hero = () => {
 			<div className="container mx-auto px-4 relative z-10">
 				<div className="text-center max-w-4xl mx-auto">
 					{/* Main Heading */}
-					<h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up">
-						<span className="gradient-text">{heading1}</span>
-						<br />
-						<span className="text-foreground">{heading2}</span>
-					</h1>
+					{(heading1 || heading2) && (
+						<h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up">
+							<span className="gradient-text">{heading1}</span>
+							{heading2 && (
+								<>
+									<br />
+									<span className="text-foreground">{heading2}</span>
+								</>
+							)}
+						</h1>
+					)}
 
 					{/* Subtitle */}
-					<p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in-up delay-200">
-						{subtitle}
-					</p>
+					{subtitle && (
+						<p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in-up delay-200">
+							{subtitle}
+						</p>
+					)}
 
 					{/* CTA Buttons */}
 					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in-up delay-400">

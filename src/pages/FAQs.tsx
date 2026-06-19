@@ -1,86 +1,67 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SeoHead from '@/components/SeoHead';
+import { PAGE_SEO } from '@/lib/seo';
+import { breadcrumbSchema, faqSchema, organizationSchema } from '@/lib/schema';
+import { useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { MessageCircle, Clock, DollarSign, Palette, Code, Smartphone } from 'lucide-react';
+import { usePageContent } from '@/hooks/use-content';
 
 const FAQs = () => {
-  const faqCategories = [
-    {
-      title: "General Questions",
-      icon: MessageCircle,
-      faqs: [
-        {
-          question: "What services does A TECH offer?",
-          answer: "We specialize in web development, mobile app development, UI/UX design, and custom software systems. Our team creates stunning, functional digital solutions tailored to your business needs."
-        },
-        {
-          question: "How long has A TECH been in business?",
-          answer: "A TECH has been delivering cutting-edge digital solutions for over 8 years, helping businesses transform their digital presence with innovative technology."
-        },
-        {
-          question: "What makes A TECH different from other agencies?",
-          answer: "We combine creativity with technical expertise, using the latest technologies and design trends. Our focus on user experience, performance optimization, and long-term partnerships sets us apart."
-        }
-      ]
-    },
-    {
-      title: "Project Process",
-      icon: Clock,
-      faqs: [
-        {
-          question: "What's your development process?",
-          answer: "We follow a structured 5-phase process: Discovery & Planning, Design & Prototyping, Development & Testing, Launch & Deployment, and Ongoing Support & Maintenance."
-        },
-        {
-          question: "How long does a typical project take?",
-          answer: "Project timelines vary based on complexity. Simple websites take 2-4 weeks, complex web applications 6-12 weeks, and mobile apps 8-16 weeks. We provide detailed timelines during planning."
-        },
-        {
-          question: "Can I track my project's progress?",
-          answer: "Absolutely! We provide regular updates, use project management tools for transparency, and schedule weekly check-ins to ensure you're always informed about progress."
-        }
-      ]
-    },
-    {
-      title: "Pricing & Investment",
-      icon: DollarSign,
-      faqs: [
-        {
-          question: "How do you price your services?",
-          answer: "We offer flexible pricing models: fixed-price projects, hourly rates, and retainer agreements. Pricing depends on project scope, complexity, and timeline requirements."
-        },
-        {
-          question: "Do you offer payment plans?",
-          answer: "Yes! We offer flexible payment schedules typically split into milestones: 30% upfront, 40% at midpoint, and 30% upon completion. Custom payment plans are available for larger projects."
-        },
-        {
-          question: "What's included in your pricing?",
-          answer: "Our pricing includes design, development, testing, deployment, and 30 days of post-launch support. Additional features like SEO optimization, analytics setup, and training are available."
-        }
-      ]
-    },
-    {
-      title: "Design & Development",
-      icon: Palette,
-      faqs: [
-        {
-          question: "Do you create custom designs?",
-          answer: "Yes! Every project gets a custom design tailored to your brand, industry, and target audience. We don't use templates - every design is unique and built from scratch."
-        },
-        {
-          question: "What technologies do you use?",
-          answer: "We use modern tech stacks including React, Next.js, Node.js, TypeScript, Python, and cloud platforms like AWS and Vercel. We always choose the best technology for your specific needs."
-        },
-        {
-          question: "Will my website be mobile-friendly?",
-          answer: "Absolutely! All our designs are responsive and mobile-first. We ensure your website looks and works perfectly on all devices and screen sizes."
-        }
-      ]
+  const { data: cmsPage } = usePageContent('faqs');
+  const merged = (cmsPage?.sections ?? []).reduce<Record<string, unknown>>((acc, section) => {
+    Object.assign(acc, section.payload ?? {});
+    return acc;
+  }, {});
+  const parseArray = <T,>(value: unknown): T[] => {
+    if (Array.isArray(value)) return value as T[];
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? (parsed as T[]) : [];
+      } catch {
+        return [];
+      }
     }
-  ];
+    return [];
+  };
+
+  const faqCategories = parseArray<any>(merged.faqCategories).map((category) => ({
+    ...category,
+    icon:
+      category.icon === 'Clock' ? Clock :
+      category.icon === 'DollarSign' ? DollarSign :
+      category.icon === 'Palette' ? Palette :
+      category.icon === 'Code' ? Code :
+      category.icon === 'Smartphone' ? Smartphone :
+      MessageCircle,
+  }));
+
+  const allFaqs = useMemo(
+    () =>
+      faqCategories.flatMap((category) =>
+        (category.faqs ?? []).map((faq: { question: string; answer: string }) => ({
+          question: faq.question,
+          answer: faq.answer,
+        }))
+      ),
+    [faqCategories]
+  );
 
   return (
     <div className="min-h-screen">
+      <SeoHead
+        {...PAGE_SEO.faqs}
+        jsonLd={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'FAQs', path: '/faqs' },
+          ]),
+          ...(allFaqs.length > 0 ? [faqSchema(allFaqs)] : []),
+        ]}
+      />
       <Navigation />
       <main className="pt-16">
         {/* Hero Section */}
@@ -89,10 +70,10 @@ const FAQs = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Frequently Asked <span className="gradient-text">Questions</span>
+                {String(merged.heroTitle ?? '')} <span className="gradient-text">{String(merged.heroAccent ?? '')}</span>
               </h1>
               <p className="text-xl text-muted-foreground animate-fade-in-up">
-                Find answers to common questions about our services, process, and how we can help transform your digital presence.
+                {String(merged.heroDescription ?? '')}
               </p>
             </div>
           </div>

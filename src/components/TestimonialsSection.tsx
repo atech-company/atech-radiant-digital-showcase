@@ -3,42 +3,28 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
+import { submitTestimonial, Testimonial } from '@/lib/content';
+import { useHomeContent, useTestimonials } from '@/hooks/use-content';
+import { useQueryClient } from '@tanstack/react-query';
 
 const TestimonialsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { user } = useAuth();
+  const { data: home } = useHomeContent();
+  const queryClient = useQueryClient();
+  const { data } = useTestimonials();
+  const [company, setCompany] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [rating, setRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'CEO at TechStart',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-      content: 'A TECH transformed our vision into reality. Their attention to detail and technical expertise exceeded our expectations. The project was delivered on time and within budget.',
-      rating: 5,
-    },
-    {
-      name: 'Michael Chen',
-      role: 'CTO at InnovateLab',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      content: 'Outstanding work! The team at A TECH delivered a complex mobile application that has significantly improved our user engagement. Highly recommended!',
-      rating: 5,
-    },
-    {
-      name: 'Emily Rodriguez',
-      role: 'Founder at GreenTech',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-      content: 'Professional, creative, and reliable. A TECH helped us build a scalable web platform that has become the backbone of our business operations.',
-      rating: 5,
-    },
-    {
-      name: 'David Thompson',
-      role: 'Director at FinanceFlow',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      content: 'The UI/UX design work was exceptional. A TECH created an intuitive interface that our users love. The design perfectly balances functionality with aesthetics.',
-      rating: 5,
-    },
-  ];
+  const testimonials = data?.testimonials ?? [];
 
   useEffect(() => {
+    if (testimonials.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
@@ -56,16 +42,47 @@ const TestimonialsSection = () => {
     setCurrentIndex(currentIndex === 0 ? testimonials.length - 1 : currentIndex - 1);
   };
 
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !feedback.trim()) return;
+    setIsSubmitting(true);
+
+    try {
+      await submitTestimonial({
+        name: user.username,
+        email: user.email,
+        role: company.trim() ? `Client at ${company.trim()}` : 'Client',
+        avatar: user.avatar,
+        content: feedback.trim(),
+        rating,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      setCurrentIndex(0);
+      setCompany('');
+      setFeedback('');
+      setRating(5);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (testimonials.length === 0) return (
+    <section className="py-20 bg-gradient-to-br from-card/50 to-background">
+      <div className="container mx-auto px-4 text-center text-muted-foreground">
+        No testimonials configured yet.
+      </div>
+    </section>
+  );
+
   return (
     <section className="py-20 bg-gradient-to-br from-card/50 to-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            What Our <span className="gradient-text">Clients Say</span>
+            {String((home as any)?.testimonialsTitle ?? 'Testimonials')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Don't just take our word for it. Here's what our satisfied clients 
-            have to say about their experience working with A TECH.
+            {String((home as any)?.testimonialsDescription ?? '')}
           </p>
         </div>
 
@@ -89,7 +106,7 @@ const TestimonialsSection = () => {
               <div className="flex items-center justify-center">
                 <Avatar className="h-16 w-16 mr-4 border-2 border-primary/30">
                   <AvatarImage 
-                    src={testimonials[currentIndex].image} 
+                    src={testimonials[currentIndex].avatar} 
                     alt={testimonials[currentIndex].name} 
                   />
                   <AvatarFallback>
@@ -138,6 +155,44 @@ const TestimonialsSection = () => {
               />
             ))}
           </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto mt-14">
+          {user ? (
+            <Card className="p-6 space-y-4 border-primary/20">
+              <h3 className="text-xl font-semibold">Share your feedback</h3>
+              <form className="space-y-4" onSubmit={handleSubmitFeedback}>
+                <Input
+                  placeholder="Company (optional)"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                />
+                <Textarea
+                  placeholder="Write your testimonial..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  required
+                />
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setRating(value)}
+                      className="p-1"
+                    >
+                      <Star className={`h-5 w-5 ${value <= rating ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                  ))}
+                </div>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit Testimonial'}</Button>
+              </form>
+            </Card>
+          ) : (
+            <Card className="p-6 text-center text-muted-foreground border-primary/20">
+              Please login to share your testimonial.
+            </Card>
+          )}
         </div>
       </div>
     </section>

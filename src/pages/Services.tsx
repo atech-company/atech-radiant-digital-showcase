@@ -1,7 +1,13 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SeoHead from '@/components/SeoHead';
+import { PAGE_SEO } from '@/lib/seo';
+import { breadcrumbSchema, organizationSchema } from '@/lib/schema';
+import { Link } from 'react-router-dom';
+import { SERVICE_PAGES } from '@/data/seo-services';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { usePageContent } from '@/hooks/use-content';
 import { 
   Code, 
   Smartphone, 
@@ -18,120 +24,56 @@ import {
 } from 'lucide-react';
 
 const Services = () => {
-  const services = [
-    {
-      icon: Code,
-      title: "Web Development",
-      description: "Modern, responsive websites and web applications built with cutting-edge technologies.",
-      features: [
-        "Responsive Design",
-        "SEO Optimization", 
-        "Performance Optimization",
-        "Progressive Web Apps",
-        "E-commerce Solutions",
-        "Content Management Systems"
-      ],
-      technologies: ["React", "Next.js", "TypeScript", "Node.js", "MongoDB", "AWS"],
-      pricing: {
-        starter: { price: "$2,500", duration: "2-3 weeks", features: ["5-page website", "Mobile responsive", "Basic SEO", "Contact forms"] },
-        professional: { price: "$7,500", duration: "4-6 weeks", features: ["Custom design", "CMS integration", "Advanced SEO", "Analytics setup", "Performance optimization"] },
-        enterprise: { price: "$15,000+", duration: "8-12 weeks", features: ["Complex functionality", "Third-party integrations", "Advanced security", "Scalable architecture", "Ongoing support"] }
-      }
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile App Development",
-      description: "Native and cross-platform mobile applications for iOS and Android platforms.",
-      features: [
-        "Cross-platform Development",
-        "Native Performance",
-        "Offline Functionality",
-        "Push Notifications",
-        "App Store Optimization",
-        "Backend Integration"
-      ],
-      technologies: ["React Native", "Flutter", "Swift", "Kotlin", "Firebase", "GraphQL"],
-      pricing: {
-        starter: { price: "$8,000", duration: "6-8 weeks", features: ["Cross-platform app", "Basic functionality", "App store submission", "Basic backend"] },
-        professional: { price: "$20,000", duration: "10-14 weeks", features: ["Advanced features", "Custom UI/UX", "Backend development", "Admin panel", "Analytics"] },
-        enterprise: { price: "$40,000+", duration: "16-24 weeks", features: ["Complex functionality", "Multiple platforms", "Advanced security", "Scalable backend", "Maintenance plan"] }
-      }
-    },
-    {
-      icon: Palette,
-      title: "UI/UX Design",
-      description: "User-centered design solutions that create exceptional digital experiences.",
-      features: [
-        "User Research",
-        "Wireframing & Prototyping",
-        "Visual Design",
-        "Design Systems",
-        "Usability Testing",
-        "Brand Integration"
-      ],
-      technologies: ["Figma", "Adobe XD", "Sketch", "Principle", "InVision", "Miro"],
-      pricing: {
-        starter: { price: "$1,500", duration: "1-2 weeks", features: ["UI design", "Style guide", "Basic prototyping", "Design handoff"] },
-        professional: { price: "$4,000", duration: "3-4 weeks", features: ["UX research", "User journeys", "Interactive prototypes", "Design system", "Usability testing"] },
-        enterprise: { price: "$8,000+", duration: "6-8 weeks", features: ["Comprehensive UX audit", "Advanced prototyping", "A/B testing design", "Brand guidelines", "Ongoing design support"] }
-      }
-    },
-    {
-      icon: Settings,
-      title: "Custom Systems",
-      description: "Tailored software solutions and platforms designed for your specific business needs.",
-      features: [
-        "Custom Development",
-        "System Integration",
-        "Database Design",
-        "API Development",
-        "Cloud Solutions",
-        "Scalable Architecture"
-      ],
-      technologies: ["Python", "Django", "FastAPI", "PostgreSQL", "Docker", "Kubernetes"],
-      pricing: {
-        starter: { price: "$5,000", duration: "3-4 weeks", features: ["Basic automation", "Simple integrations", "Database setup", "Basic admin panel"] },
-        professional: { price: "$15,000", duration: "6-10 weeks", features: ["Complex workflows", "API development", "Advanced integrations", "Custom dashboard", "Documentation"] },
-        enterprise: { price: "$30,000+", duration: "12-20 weeks", features: ["Enterprise architecture", "Multi-system integration", "Advanced security", "Scalable infrastructure", "Ongoing maintenance"] }
+  const { data: cmsPage } = usePageContent('services');
+  const merged = (cmsPage?.sections ?? []).reduce<Record<string, unknown>>((acc, section) => {
+    Object.assign(acc, section.payload ?? {});
+    return acc;
+  }, {});
+  const parseArray = <T,>(value: unknown): T[] => {
+    if (Array.isArray(value)) return value as T[];
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? (parsed as T[]) : [];
+      } catch {
+        return [];
       }
     }
-  ];
+    return [];
+  };
 
-  const whyChooseUs = [
-    {
-      icon: Zap,
-      title: "Cutting-Edge Technology",
-      description: "We use the latest technologies and frameworks to ensure your project is future-ready."
-    },
-    {
-      icon: Shield,
-      title: "Security First",
-      description: "Built-in security measures and best practices to protect your data and users."
-    },
-    {
-      icon: Clock,
-      title: "On-Time Delivery",
-      description: "We stick to deadlines and deliver projects within the agreed timeframe."
-    },
-    {
-      icon: Users,
-      title: "Expert Team",
-      description: "Our team of experienced developers and designers brings years of expertise."
-    },
-    {
-      icon: Star,
-      title: "Quality Assurance",
-      description: "Rigorous testing and quality checks ensure flawless performance."
-    },
-    {
-      icon: TrendingUp,
-      title: "Scalable Solutions",
-      description: "Built to grow with your business and handle increasing demands."
-    }
-  ];
+  const services = parseArray<any>(merged.services);
+
+  const whyChooseUs = parseArray<{ icon?: string; title: string; description: string }>(merged.whyChooseUs).map((item) => ({
+    ...item,
+    icon:
+      item.icon === 'Shield' ? Shield :
+      item.icon === 'Clock' ? Clock :
+      item.icon === 'Users' ? Users :
+      item.icon === 'Star' ? Star :
+      item.icon === 'TrendingUp' ? TrendingUp :
+      Zap,
+  }));
+
+  const iconMap: Record<string, any> = {
+    Code,
+    Smartphone,
+    Palette,
+    Settings,
+  };
 
   return (
     <div className="min-h-screen">
+      <SeoHead
+        {...PAGE_SEO.services}
+        jsonLd={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Services', path: '/services' },
+          ]),
+        ]}
+      />
       <Navigation />
       <main className="pt-16">
         {/* Hero Section */}
@@ -140,10 +82,10 @@ const Services = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Our <span className="gradient-text">Services</span>
+                {String(merged.heroTitle ?? '')} <span className="gradient-text">{String(merged.heroAccent ?? '')}</span>
               </h1>
               <p className="text-xl text-muted-foreground animate-fade-in-up">
-                Comprehensive digital solutions to transform your business with cutting-edge technology and innovative design.
+                {String(merged.heroDescription ?? '')}
               </p>
             </div>
           </div>
@@ -152,15 +94,21 @@ const Services = () => {
         {/* Services Grid */}
         <section className="py-20">
           <div className="container mx-auto px-4">
+            {services.length === 0 && (
+              <p className="text-center text-muted-foreground mb-10">No services configured in CMS yet.</p>
+            )}
             <div className="space-y-20">
               {services.map((service, index) => (
                 <div key={index} className="max-w-7xl mx-auto">
+                  {(() => {
+                    const ServiceIcon = iconMap[service.icon as string] ?? Code;
+                    return (
                   <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''}`}>
                     {/* Service Info */}
                     <div className={`space-y-8 ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
                       <div className="flex items-center gap-4">
                         <div className="p-4 rounded-2xl bg-gradient-to-r from-primary to-secondary glow-effect">
-                          <service.icon className="h-8 w-8 text-background" />
+                          <ServiceIcon className="h-8 w-8 text-background" />
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold gradient-text">
                           {service.title}
@@ -227,6 +175,8 @@ const Services = () => {
                       </div>
                     </div>
                   </div>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
@@ -256,6 +206,29 @@ const Services = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="py-16 bg-card/30 border-y border-border">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
+              Explore Our <span className="gradient-text">Technology Services</span>
+            </h2>
+            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-10">
+              Deep-dive into software development, AI solutions, ERP, POS, and more.
+            </p>
+            <nav aria-label="Service pages" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+              {SERVICE_PAGES.map((service) => (
+                <Link
+                  key={service.slug}
+                  to={`/services/${service.slug}`}
+                  className="p-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 hover:border-primary/40 transition-colors"
+                >
+                  <h3 className="font-semibold text-foreground">{service.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{service.intro}</p>
+                </Link>
+              ))}
+            </nav>
           </div>
         </section>
 

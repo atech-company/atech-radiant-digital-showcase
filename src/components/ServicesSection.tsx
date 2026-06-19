@@ -23,54 +23,18 @@ type IconName = keyof typeof iconMap;
 const ServicesSection = () => {
   const { data } = useHomeContent();
 
-  const services = useMemo(() => data?.services ?? [
-    {
-      icon: 'Code' as IconName,
-      title: 'Web Development',
-      description: 'Modern, responsive websites and web applications built with cutting-edge technologies.',
-      features: ['React & Next.js', 'E-commerce Solutions', 'CMS Development', 'API Integration'],
-      colorFrom: 'primary/20',
-      colorTo: 'primary/10',
-    },
-    {
-      icon: 'Smartphone' as IconName,
-      title: 'Mobile App Development',
-      description: 'Native and cross-platform mobile applications for iOS and Android devices.',
-      features: ['React Native', 'Flutter Development', 'iOS/Android Native', 'App Store Optimization'],
-      colorFrom: 'secondary/20',
-      colorTo: 'secondary/10',
-    },
-    {
-      icon: 'Palette' as IconName,
-      title: 'UI/UX Design',
-      description: 'Beautiful, user-centered designs that enhance user experience and drive engagement.',
-      features: ['User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
-      colorFrom: 'accent/20',
-      colorTo: 'accent/10',
-    },
-    {
-      icon: 'Settings' as IconName,
-      title: 'Custom Systems',
-      description: 'Tailored software solutions and enterprise systems to meet your specific needs.',
-      features: ['Database Design', 'Cloud Integration', 'API Development', 'DevOps Setup'],
-      colorFrom: 'primary/20',
-      colorTo: 'accent/10',
-    },
-  ], [data]);
+  const services = useMemo(() => data?.services ?? [], [data]);
 
   const [activeService, setActiveService] = useState(0);
+  if (services.length === 0) return null;
 
   return (
     <section className="py-20 bg-gradient-to-br from-background via-card/50 to-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Our <span className="gradient-text">Services</span>
+            <span className="gradient-text">Services</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            From concept to deployment, we offer comprehensive digital solutions 
-            tailored to your business needs.
-          </p>
         </div>
 
         {/* Services Grid */}
