@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { SITE_NAME } from '@/lib/seo';
 import { useSiteBranding } from '@/hooks/use-content';
+import BrandHeartIcon from '@/components/BrandHeartIcon';
 
 type SiteLogoProps = {
   className?: string;
@@ -24,8 +25,10 @@ const SiteLogo = ({
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      {logoIcon && (
+      {logoIcon ? (
         <img src={logoIcon} alt="" className={iconClassName} aria-hidden="true" />
+      ) : (
+        <BrandHeartIcon className={iconClassName} />
       )}
       {logo ? (
         <img src={logo} alt={siteName} className={logoClassName} />
