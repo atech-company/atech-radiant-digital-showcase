@@ -15,6 +15,18 @@ i18n:
   default_locale: en
 
 collections:
+  - name: "site"
+    label: "Site Identity"
+    files:
+      - file: "public/content/site.json"
+        label: "Branding"
+        name: "siteBranding"
+        fields:
+          - { label: "Site Name", name: "siteName", widget: "string" }
+          - { label: "Icon Beside Logo", name: "logoIcon", widget: "image", required: false }
+          - { label: "Site Logo", name: "logo", widget: "image", required: false }
+          - { label: "Favicon", name: "favicon", widget: "image", required: false }
+
   - name: "home"
     label: "Homepage"
     files:

@@ -19,9 +19,9 @@ export function absoluteUrl(path = "/"): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-export function buildTitle(pageTitle?: string): string {
-  if (!pageTitle) return `${SITE_NAME} | Technology Company & Software Development`;
-  return `${pageTitle} | ${SITE_NAME}`;
+export function buildTitle(pageTitle?: string, siteName: string = SITE_NAME): string {
+  if (!pageTitle) return `${siteName} | Technology Company & Software Development`;
+  return `${pageTitle} | ${siteName}`;
 }
 
 export const PAGE_SEO: Record<string, SeoMeta> = {

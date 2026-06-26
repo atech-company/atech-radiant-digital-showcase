@@ -1,5 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { CmsPageContent, fetchHomeContent, fetchMyTestimonials, fetchPageContent, fetchProjectBySlug, fetchProjects, fetchTestimonials, HomeContent, Project, ProjectsList, TestimonialsList } from "@/lib/content";
+import { CmsPageContent, fetchHomeContent, fetchMyTestimonials, fetchPageContent, fetchProjectBySlug, fetchProjects, fetchSiteBranding, fetchTestimonials, HomeContent, Project, ProjectsList, SiteBranding, TestimonialsList } from "@/lib/content";
+
+export function useSiteBranding() {
+	return useQuery<SiteBranding, Error>({
+		queryKey: ["site-branding"],
+		queryFn: ({ signal }) => fetchSiteBranding(signal),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 30 * 60 * 1000,
+	});
+}
 
 export function useHomeContent() {
 	return useQuery<HomeContent, Error>({

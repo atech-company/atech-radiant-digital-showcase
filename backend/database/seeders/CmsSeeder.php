@@ -157,7 +157,7 @@ class CmsSeeder extends Seeder
             ['key' => 'global'],
             [
                 'value' => [
-                    'siteName' => 'Atech Digital',
+                    'siteName' => 'A TECH',
                     'contactEmail' => 'hello@atech.local',
                     'phone' => '+20 100 000 0000',
                 ],

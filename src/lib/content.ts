@@ -1,3 +1,45 @@
+export type SiteBranding = {
+	siteName?: string;
+	logoIcon?: string;
+	logo?: string;
+	favicon?: string;
+	contactEmail?: string;
+	phone?: string;
+};
+
+type SiteSettingsApiResponse = {
+	settings?: {
+		global?: SiteBranding;
+	};
+};
+
+const DEFAULT_BRANDING: SiteBranding = {
+	siteName: "A TECH",
+};
+
+export async function fetchSiteBranding(signal?: AbortSignal): Promise<SiteBranding> {
+	if (API_BASE_URL) {
+		try {
+			const response = await fetchJson<SiteSettingsApiResponse>(`${API_BASE_URL}/api/v1/settings`, signal);
+			return {
+				...DEFAULT_BRANDING,
+				...(response.settings?.global ?? {}),
+			};
+		} catch {
+			// Fallback keeps frontend running if backend is unavailable.
+		}
+	}
+
+	try {
+		return {
+			...DEFAULT_BRANDING,
+			...(await fetchJson<SiteBranding>("/content/site.json", signal)),
+		};
+	} catch {
+		return DEFAULT_BRANDING;
+	}
+}
+
 export type HomeContent = {
 	heroHeading1: string;
 	heroHeading2: string;

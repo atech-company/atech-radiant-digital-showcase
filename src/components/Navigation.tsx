@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { isAdmin } from '@/lib/auth';
+import SiteLogo from '@/components/SiteLogo';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,8 +50,8 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold gradient-text">A TECH</div>
+          <Link to="/" className="flex items-center">
+            <SiteLogo />
           </Link>
 
           {/* Desktop Navigation */}

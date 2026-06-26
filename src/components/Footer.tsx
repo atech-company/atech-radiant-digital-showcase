@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Github, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { SERVICE_PAGES } from '@/data/seo-services';
+import SiteLogo from '@/components/SiteLogo';
 
 const Footer = () => {
   return (
@@ -8,7 +9,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold gradient-text">A TECH</h3>
+            <SiteLogo />
             <p className="text-muted-foreground">
               Technology company specializing in software development, web development,
               AI solutions, ERP & POS systems, and digital transformation.
