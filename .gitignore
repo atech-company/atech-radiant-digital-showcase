@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Laravel backend — deployed separately on admin.atechleb.com
+backend/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
