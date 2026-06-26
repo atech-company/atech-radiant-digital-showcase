@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SiteSettingController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Api\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
+    Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.*');
     Route::get('/pages/{slug}', [PageController::class, 'showBySlug']);
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/projects/{slug}', [ProjectController::class, 'showBySlug']);

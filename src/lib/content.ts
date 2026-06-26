@@ -17,6 +17,20 @@ const DEFAULT_BRANDING: SiteBranding = {
 	siteName: "A TECH",
 };
 
+function resolveApiBaseUrl(): string {
+	const fromEnv = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "");
+	if (fromEnv) return fromEnv;
+
+	if (typeof window !== "undefined") {
+		const host = window.location.hostname;
+		if (host === "atechleb.com" || host === "www.atechleb.com") {
+			return "https://admin.atechleb.com";
+		}
+	}
+
+	return "";
+}
+
 export async function fetchSiteBranding(signal?: AbortSignal): Promise<SiteBranding> {
 	if (API_BASE_URL) {
 		try {
@@ -76,7 +90,7 @@ export type CmsPageContent = {
 	}>;
 };
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "");
+const API_BASE_URL = resolveApiBaseUrl();
 
 async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
 	const response = await fetch(url, { signal, headers: { "cache-control": "no-cache" } });
