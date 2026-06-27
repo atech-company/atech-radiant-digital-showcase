@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Code, Smartphone, Palette, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroBackground from '@/assets/hero-background.jpg';
-import heroBackgroundWebp from '@/assets/hero-background.webp';
 import { useHomeContent } from '@/hooks/use-content';
 
 const Hero = () => {
@@ -29,26 +28,21 @@ const Hero = () => {
 
 	return (
 		<section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-			<picture className="absolute inset-0">
-				<source srcSet={heroBackgroundWebp} type="image/webp" />
-				<img
-					src={heroBackground}
-					alt=""
-					width={1920}
-					height={1080}
-					decoding="async"
-					fetchPriority="high"
-					className="h-full w-full object-cover"
-				/>
-			</picture>
+			{/* Background Image with Overlay */}
+			<div 
+				className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+				style={{ backgroundImage: `url(${heroBackground})` }}
+			/>
 			<div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-transparent" />
 			
-			<div className="absolute top-20 left-10 w-20 h-20 rounded-full bg-primary/20 animate-float" aria-hidden="true" />
-			<div className="absolute top-40 right-20 w-16 h-16 rounded-full bg-secondary/20 animate-float delay-1000" aria-hidden="true" />
-			<div className="absolute bottom-40 left-20 w-24 h-24 rounded-full bg-accent/20 animate-float delay-2000" aria-hidden="true" />
+			{/* Floating Elements */}
+			<div className="absolute top-20 left-10 w-20 h-20 rounded-full bg-primary/20 animate-float" />
+			<div className="absolute top-40 right-20 w-16 h-16 rounded-full bg-secondary/20 animate-float delay-1000" />
+			<div className="absolute bottom-40 left-20 w-24 h-24 rounded-full bg-accent/20 animate-float delay-2000" />
 
 			<div className="container mx-auto px-4 relative z-10">
 				<div className="text-center max-w-4xl mx-auto">
+					{/* Main Heading */}
 					{(heading1 || heading2) && (
 						<h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up">
 							<span className="gradient-text">{heading1}</span>
@@ -61,12 +55,14 @@ const Hero = () => {
 						</h1>
 					)}
 
+					{/* Subtitle */}
 					{subtitle && (
 						<p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in-up delay-200">
 							{subtitle}
 						</p>
 					)}
 
+					{/* CTA Buttons */}
 					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in-up delay-400">
 						{ctas.map((cta, idx) => (
 							<Button 
@@ -86,6 +82,7 @@ const Hero = () => {
 						))}
 					</div>
 
+					{/* Service Icons */}
 					<div className="grid grid-cols-3 gap-8 max-w-md mx-auto animate-fade-in-up delay-600">
 						{serviceIcons.map((s, i) => (
 							<div className="text-center group cursor-pointer" key={i}>
@@ -99,7 +96,8 @@ const Hero = () => {
 				</div>
 			</div>
 
-			<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce" aria-hidden="true">
+			{/* Scroll Indicator */}
+			<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
 				<div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
 					<div className="w-1 h-3 bg-primary rounded-full mt-2 animate-pulse"></div>
 				</div>
