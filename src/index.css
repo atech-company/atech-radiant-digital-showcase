@@ -126,7 +126,12 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     background: var(--gradient-hero);
-    background-attachment: fixed;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      background-attachment: fixed;
+    }
   }
 
   .gradient-text {

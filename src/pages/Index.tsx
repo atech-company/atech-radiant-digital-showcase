@@ -1,15 +1,21 @@
+import { Suspense, lazy } from 'react';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
-import AboutSection from '@/components/AboutSection';
-import ServicesSection from '@/components/ServicesSection';
-import ProjectsSection from '@/components/ProjectsSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
-import ContactCTA from '@/components/ContactCTA';
 import Footer from '@/components/Footer';
 import SeoHead from '@/components/SeoHead';
-import SeoHomeIntro from '@/components/SeoHomeIntro';
 import { PAGE_SEO } from '@/lib/seo';
 import { faqSchema, localBusinessSchema, organizationSchema, websiteSchema } from '@/lib/schema';
+
+const SeoHomeIntro = lazy(() => import('@/components/SeoHomeIntro'));
+const AboutSection = lazy(() => import('@/components/AboutSection'));
+const ServicesSection = lazy(() => import('@/components/ServicesSection'));
+const ProjectsSection = lazy(() => import('@/components/ProjectsSection'));
+const TestimonialsSection = lazy(() => import('@/components/TestimonialsSection'));
+const ContactCTA = lazy(() => import('@/components/ContactCTA'));
+
+const SectionFallback = ({ minHeight = '12rem' }: { minHeight?: string }) => (
+  <div aria-hidden="true" style={{ minHeight }} />
+);
 
 const Index = () => {
   const meta = PAGE_SEO.home;
@@ -38,12 +44,24 @@ const Index = () => {
       <Navigation />
       <main>
         <Hero />
-        <SeoHomeIntro />
-        <AboutSection />
-        <ServicesSection />
-        <ProjectsSection />
-        <TestimonialsSection />
-        <ContactCTA />
+        <Suspense fallback={<SectionFallback minHeight="16rem" />}>
+          <SeoHomeIntro />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <AboutSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ServicesSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ProjectsSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <TestimonialsSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ContactCTA />
+        </Suspense>
       </main>
       <Footer />
     </div>

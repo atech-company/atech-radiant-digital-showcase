@@ -15,4 +15,30 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: "es2020",
+    cssCodeSplit: true,
+    modulePreload: { polyfill: false },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+
+          if (id.includes("react-dom") || id.includes("/react/") || id.includes("react-router")) {
+            return "vendor-react";
+          }
+          if (id.includes("@tanstack/react-query")) {
+            return "vendor-query";
+          }
+          if (id.includes("lucide-react") || id.includes("@radix-ui")) {
+            return "vendor-ui";
+          }
+          if (id.includes("embla-carousel")) {
+            return "vendor-carousel";
+          }
+          return "vendor";
+        },
+      },
+    },
+  },
 }));
