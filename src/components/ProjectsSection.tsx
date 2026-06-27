@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useHomeContent, useProjectsList } from '@/hooks/use-content';
+import ProjectVisitButton from '@/components/ProjectVisitButton';
 import {
   Carousel,
   CarouselContent,
@@ -83,8 +84,8 @@ const ProjectsSection = () => {
                       key={project.slug}
                       className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
                     >
-                      <Link to={`/projects/${project.slug}`} className="block h-full">
-                        <Card className="overflow-hidden group cursor-pointer h-full hover-scale transition-all duration-300 hover:border-primary/50">
+                      <Card className="overflow-hidden group h-full hover-scale transition-all duration-300 hover:border-primary/50 flex flex-col">
+                        <Link to={`/projects/${project.slug}`} className="block flex-1">
                           <div className="relative h-48 overflow-hidden">
                             {project.cover ? (
                               <img
@@ -98,15 +99,15 @@ const ProjectsSection = () => {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           </div>
 
-                          <div className="p-6">
+                          <div className="p-6 pb-4">
                             <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                               {project.title}
                             </h3>
-                            <p className="text-muted-foreground mb-4 line-clamp-3">
+                            <p className="text-muted-foreground line-clamp-3">
                               {project.summary}
                             </p>
                             {project.tags && project.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-2 mt-4">
                                 {project.tags.slice(0, 3).map((tag) => (
                                   <Badge
                                     key={tag}
@@ -119,8 +120,13 @@ const ProjectsSection = () => {
                               </div>
                             )}
                           </div>
-                        </Card>
-                      </Link>
+                        </Link>
+                        {project.websiteUrl && (
+                          <div className="px-6 pb-6 pt-0 mt-auto">
+                            <ProjectVisitButton url={project.websiteUrl} fullWidth />
+                          </div>
+                        )}
+                      </Card>
                     </CarouselItem>
                   ))}
                 </CarouselContent>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { getFavorites, toggleFavorite } from '@/lib/favorites';
 import { useState } from 'react';
+import ProjectVisitButton from '@/components/ProjectVisitButton';
 
 const Projects = () => {
   const { data, isLoading, error } = useProjectsList();
@@ -56,28 +57,13 @@ const Projects = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((p) => (
-                  <Link key={p.slug} to={`/projects/${p.slug}`}>
-                    <Card className="p-6 h-full transition-colors hover:border-primary/50">
+                  <Card key={p.slug} className="p-6 h-full transition-colors hover:border-primary/50 flex flex-col">
+                    <Link to={`/projects/${p.slug}`} className="flex-1 block">
                       {p.cover && (
                         <img src={p.cover} alt={p.title} className="w-full h-40 object-cover rounded mb-4" />
                       )}
                       <h3 className="text-xl font-bold mb-2">{p.title}</h3>
                       <p className="text-muted-foreground text-sm mb-3">{p.summary}</p>
-                      {user && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleFavorite(user.id, p.slug);
-                            setVersion((v) => v + 1);
-                          }}
-                          className="mb-3"
-                        >
-                          {favorites.includes(p.slug) ? 'Remove Favorite' : 'Add to Favorites'}
-                        </Button>
-                      )}
                       {p.tags && p.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {p.tags.map((t) => (
@@ -85,8 +71,24 @@ const Projects = () => {
                           ))}
                         </div>
                       )}
-                    </Card>
-                  </Link>
+                    </Link>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {user && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            toggleFavorite(user.id, p.slug);
+                            setVersion((v) => v + 1);
+                          }}
+                        >
+                          {favorites.includes(p.slug) ? 'Remove Favorite' : 'Add to Favorites'}
+                        </Button>
+                      )}
+                      <ProjectVisitButton url={p.websiteUrl} />
+                    </div>
+                  </Card>
                 ))}
               </div>
             )

@@ -149,6 +149,7 @@ export type Project = {
 	title: string;
 	slug: string;
 	summary: string;
+	websiteUrl?: string;
 	publishedAt?: string;
 	cover?: string;
 	gallery?: string[];
@@ -208,6 +209,7 @@ function normalizeProject(project: Project & { gallery?: unknown; date?: string 
 
 	return {
 		...project,
+		websiteUrl: project.websiteUrl ?? (project as Project & { website_url?: string }).website_url,
 		publishedAt: project.publishedAt ?? project.date,
 		gallery: normalizedGallery,
 	};

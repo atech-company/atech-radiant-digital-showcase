@@ -9,6 +9,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { isFavorite, toggleFavorite } from '@/lib/favorites';
+import ProjectVisitButton from '@/components/ProjectVisitButton';
 
 const ProjectDetails = () => {
   const { slug = '' } = useParams();
@@ -63,20 +64,22 @@ const ProjectDetails = () => {
               </Link>
 
               <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4">{project.title}</h1>
-              {user && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mb-4"
-                  onClick={() => {
-                    toggleFavorite(user.id, project.slug);
-                    setRefreshFav((v) => v + 1);
-                  }}
-                >
-                  {isFavorite(user.id, project.slug) ? 'Remove Favorite' : 'Add to Favorites'}
-                </Button>
-              )}
+              <div className="flex flex-wrap gap-3 mb-4">
+                {user && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      toggleFavorite(user.id, project.slug);
+                      setRefreshFav((v) => v + 1);
+                    }}
+                  >
+                    {isFavorite(user.id, project.slug) ? 'Remove Favorite' : 'Add to Favorites'}
+                  </Button>
+                )}
+                <ProjectVisitButton url={project.websiteUrl} />
+              </div>
               <p className="text-lg text-muted-foreground mb-3">{project.summary}</p>
               {formattedTime && (
                 <p className="text-sm text-muted-foreground mb-6">
